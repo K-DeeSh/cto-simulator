@@ -27,18 +27,10 @@ const STARTING_METRICS: Record<Difficulty, Metrics> = {
   },
 }
 
-// Passive per-turn recovery: represents baseline revenue and normal operations
-const PASSIVE_RECOVERY: MetricDelta = {
-  money: 3,
-  health: 2,
-  morale: 1,
-  reputation: 1,
-  techDebt: -1,
-}
-
-// Scale factor applied to all event effects — keeps events expressive
-// without making the game impossible to beat
-const EFFECT_SCALE = 0.45
+// Scale factor applied to all event effects.
+// 0.65 = effects feel impactful but don't kill in 3 turns.
+// No passive recovery — pressure is constant and intentional.
+const EFFECT_SCALE = 0.65
 
 function scaleDelta(delta: MetricDelta): MetricDelta {
   const s = (v: number | undefined) =>
@@ -163,9 +155,6 @@ export function processAction(state: GameState, action: ActionType): GameState {
     : choice.successMessage
 
   let newMetrics = applyDelta(state.metrics, appliedEffects)
-
-  // Passive per-turn recovery (business as usual)
-  newMetrics = applyDelta(newMetrics, PASSIVE_RECOVERY)
   let logIdCounter = state.logIdCounter
   const newLog: LogEntry[] = []
 
