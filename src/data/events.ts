@@ -134,7 +134,7 @@ export const ALL_EVENTS: GameEvent[] = [
     },
     delegate: {
       effects: { money: -10, techDebt: -5 },
-      successMessage: 'Нашли: сканер на одном конвейере писал в неправильный топик.',
+      successMessage: 'Нашли: сканер на одном конвейере писал в неправильный топик LogBroker.',
       microComment: 'Трекинг — не опция, это основа логистики.',
     },
   },
@@ -233,7 +233,7 @@ export const ALL_EVENTS: GameEvent[] = [
   {
     id: 'delivery_time_40',
     title: 'Время доставки выросло на 40%',
-    description: 'За последние двое суток среднее время доставки выросло с 3 до 4.2 часа. Dashboard красный. Причина неизвестна.',
+    description: 'За последние двое суток среднее время доставки выросло с 3 до 4.2 часа. Дашборд в Monium красный. Причина неизвестна.',
     urgency: 'high',
     ignore: {
       effects: { reputation: -20, money: -10 },
@@ -372,7 +372,7 @@ export const ALL_EVENTS: GameEvent[] = [
     },
     delegate: {
       effects: { money: -10, health: -5 },
-      successMessage: 'Проблема на стороне Ozon. Включили очередь с retry. Заказы дошли.',
+      successMessage: 'Проблема на стороне Ozon. Включили очередь LogBroker с retry. Заказы дошли.',
       microComment: 'Retry + dead letter queue — джентльменский набор.',
     },
   },
@@ -464,7 +464,7 @@ export const ALL_EVENTS: GameEvent[] = [
   {
     id: 'cdc_losing_events',
     title: 'CDC в YT начал терять события',
-    description: 'Change Data Capture в YT пропускает события: часть изменений в БД не попадает в аналитику.',
+    description: 'CDC из базы в YT через LogBroker пропускает события: часть изменений не попадает в аналитику.',
     urgency: 'high',
     ignore: {
       effects: { techDebt: 20, health: -10 },
@@ -478,8 +478,8 @@ export const ALL_EVENTS: GameEvent[] = [
     },
     delegate: {
       effects: { morale: -10, money: -10, techDebt: -10 },
-      successMessage: 'Нашли: переполнение буфера. Увеличили, добавили алерт.',
-      microComment: 'Backpressure нужно мониторить.',
+      successMessage: 'Нашли: переполнение буфера LogBroker. Увеличили retention, добавили алерт в Monium.',
+      microComment: 'Backpressure в LogBroker нужно мониторить.',
     },
   },
 
@@ -1050,7 +1050,7 @@ export const ALL_EVENTS: GameEvent[] = [
   {
     id: 'prod_down_metrics_green',
     title: 'Прод лежит, но метрики зелёные',
-    description: 'Клиенты не могут оформить заказы. Grafana показывает всё зелёным. Алерты молчат.',
+    description: 'Клиенты не могут оформить заказы. Monium показывает всё зелёным. Алерты молчат.',
     urgency: 'critical',
     ignore: {
       effects: { health: -25, reputation: -20 },
@@ -1058,7 +1058,7 @@ export const ALL_EVENTS: GameEvent[] = [
       riskChance: 0.55,
       riskEffects: { health: -15, reputation: -15, money: -10 },
       riskMessage: 'Простой длился 3 часа. Метрики молчали всё время.',
-      microComment: 'Зелёный dashboard — не гарантия работоспособности.',
+      microComment: 'Зелёный дашборд Monium — не гарантия работоспособности.',
     },
     delegate: {
       effects: { morale: -10, money: -5 },
