@@ -12,19 +12,44 @@ import type {
 
 const STARTING_METRICS: Record<Difficulty, Metrics> = {
   normal: {
-    health: 70,
-    morale: 65,
-    techDebt: 30,
-    money: 60,
-    reputation: 75,
+    health: 80,
+    morale: 75,
+    techDebt: 20,
+    money: 75,
+    reputation: 80,
   },
   friday: {
-    health: 50,
-    morale: 45,
+    health: 55,
+    morale: 50,
     techDebt: 55,
-    money: 38,
-    reputation: 55,
+    money: 45,
+    reputation: 60,
   },
+}
+
+// Passive per-turn recovery: represents baseline revenue and normal operations
+const PASSIVE_RECOVERY: MetricDelta = {
+  money: 3,
+  health: 2,
+  morale: 1,
+  reputation: 1,
+  techDebt: -1,
+}
+
+// Scale factor applied to all event effects — keeps events expressive
+// without making the game impossible to beat
+const EFFECT_SCALE = 0.45
+
+function scaleDelta(delta: MetricDelta): MetricDelta {
+  const s = (v: number | undefined) =>
+    v !== undefined ? Math.round(v * EFFECT_SCALE) || (v > 0 ? 1 : v < 0 ? -1 : 0) : undefined
+  return {
+    health: s(delta.health),
+    morale: s(delta.morale),
+    techDebt: s(delta.techDebt),
+    money: s(delta.money),
+    reputation: s(delta.reputation),
+  }
 }
 
 const MAX_TURNS: Record<Difficulty, number> = {
@@ -131,12 +156,16 @@ export function processAction(state: GameState, action: ActionType): GameState {
   const riskRolled =
     choice.riskChance !== undefined && Math.random() < choice.riskChance
 
-  const appliedEffects = riskRolled ? (choice.riskEffects ?? choice.effects) : choice.effects
+  const rawEffects = riskRolled ? (choice.riskEffects ?? choice.effects) : choice.effects
+  const appliedEffects = scaleDelta(rawEffects)
   const resultMessage = riskRolled
     ? (choice.riskMessage ?? choice.successMessage)
     : choice.successMessage
 
   let newMetrics = applyDelta(state.metrics, appliedEffects)
+
+  // Passive per-turn recovery (business as usual)
+  newMetrics = applyDelta(newMetrics, PASSIVE_RECOVERY)
   let logIdCounter = state.logIdCounter
   const newLog: LogEntry[] = []
 
@@ -155,7 +184,7 @@ export function processAction(state: GameState, action: ActionType): GameState {
   const remainingConsequences = []
   for (const pc of state.pendingConsequences) {
     if (pc.triggerTurn <= state.turn) {
-      newMetrics = applyDelta(newMetrics, pc.effects)
+      newMetrics = applyDelta(newMetrics, scaleDelta(pc.effects))
       const pcType = classifyDelta(pc.effects)
       newLog.push(makeLogEntry(logIdCounter++, state.turn, `⏰ ${pc.message}`, pcType))
     } else {
