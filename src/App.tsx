@@ -82,6 +82,7 @@ export default function App() {
 
   function handleRestart() {
     setIsNewRecord(false)
+    startSession('cto_simulator').then(token => { sessionTokenRef.current = token })
     setGameState(createInitialState('normal'))
     setAppPhase('playing')
   }
