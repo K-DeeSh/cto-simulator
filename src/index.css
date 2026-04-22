@@ -218,6 +218,11 @@ button {
   font-size: 0.85rem;
 }
 
+.hs-row-me {
+  color: #7c6af7;
+  font-weight: 700;
+}
+
 .hs-rank {
   color: var(--text-muted);
   width: 16px;
