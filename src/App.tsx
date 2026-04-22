@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import EndScreen, { buildHighScoreEntry } from './components/EndScreen'
 import GameScreen from './components/GameScreen'
 import LoginScreen, { getSavedLogin } from './components/LoginScreen'
 import StartScreen from './components/StartScreen'
 import { createInitialState, processAction } from './game/engine'
 import { calculateArchetype, calculateScore } from './game/archetypes'
-import { submitScore } from './api'
+import { startSession, submitScore } from './api'
 import type { ActionType, GameState, HighScoreEntry } from './types'
 
 const HS_KEY = 'cto-sim-highscores'
@@ -41,8 +41,10 @@ export default function App() {
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [highScores, setHighScores] = useState<HighScoreEntry[]>(loadHighScores)
   const [isNewRecord, setIsNewRecord] = useState(false)
+  const sessionTokenRef = useRef<string | null>(null)
 
   function handleStart() {
+    startSession('cto_simulator').then(token => { sessionTokenRef.current = token });
     setGameState(createInitialState('normal'))
     setAppPhase('playing')
   }
@@ -72,7 +74,9 @@ export default function App() {
           ignoreCount: nextState.stats.ignoreCount,
           delegateCount: nextState.stats.delegateCount,
         },
+        token: sessionTokenRef.current,
       })
+      sessionTokenRef.current = null
     }
   }
 
